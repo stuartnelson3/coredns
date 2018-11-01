@@ -252,16 +252,16 @@ func (r *Request) Scrub(reply *dns.Msg) *dns.Msg {
 	// Account for the OPT record that gets added in SizeAndDo(), subtract that length.
 	sub := 0
 	if r.Req.IsEdns0() != nil {
-		sub = optLen
+		size -= optLen
+		sub = 1
 	}
 
 	// subtract to make spaces for re-added EDNS0 OPT RR.
 	re := len(reply.Extra) - sub
-	size -= sub
 
 	l, m := 0, 0
 	origExtra := reply.Extra
-	for l < re {
+	for l <= re {
 		m = (l + re) / 2
 		reply.Extra = origExtra[:m]
 		rl = reply.Len()
@@ -284,7 +284,7 @@ func (r *Request) Scrub(reply *dns.Msg) *dns.Msg {
 		rl = reply.Len()
 	}
 
-	if rl < size {
+	if rl <= size {
 		r.SizeAndDo(reply)
 		return reply
 	}
@@ -292,7 +292,7 @@ func (r *Request) Scrub(reply *dns.Msg) *dns.Msg {
 	ra := len(reply.Answer)
 	l, m = 0, 0
 	origAnswer := reply.Answer
-	for l < ra {
+	for l <= ra {
 		m = (l + ra) / 2
 		reply.Answer = origAnswer[:m]
 		rl = reply.Len()

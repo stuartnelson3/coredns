@@ -1,0 +1,5 @@
+srv.db.example.org.	5	IN	NS	ip-10-10-33-60.x02.foo3.example.org.
+srv.db.example.org.	5	IN	NS	ip-10-10-37-54.x07.foo3.example.org.
+srv.db.example.org.	5	IN	NS	ip-10-10-40-36.x10.foo3.example.org.
+srv.db.example.org.	5	IN	NS	ip-10-10-52-54.y05.foo3.example.org.
+srv.db.example.org.	5	IN	NS	ip-10-10-89-41.z11.foo3.example.org.

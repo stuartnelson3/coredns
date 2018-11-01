@@ -1,7 +1,10 @@
 package request
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os"
 	"testing"
 
 	"github.com/coredns/coredns/plugin/test"
@@ -156,6 +159,75 @@ func TestRequestScrubExtraRegression(t *testing.T) {
 	opt := reply.Extra[len(reply.Extra)-1]
 	if opt.Header().Rrtype != dns.TypeOPT {
 		t.Errorf("Last RR must be OPT record")
+	}
+}
+
+func TestSoundCloudNoTruncate(t *testing.T) {
+	for bufsize := 1024; bufsize <= 4096; bufsize += 12 {
+		m := new(dns.Msg)
+		m.SetQuestion("http.web.stnn.rocket.srv.db.example.org", dns.TypeSRV)
+		m.SetEdns0(uint16(bufsize), true)
+		req := Request{W: &test.ResponseWriter{}, Req: m}
+
+		reply := new(dns.Msg)
+		reply.SetReply(m)
+
+		f, err := os.Open("testdata/answers.txt")
+		if err != nil {
+			t.Fatalf("Failed to open answers file: %s", err)
+		}
+		defer f.Close()
+		r := bufio.NewReader(f)
+		for {
+			line, err := r.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				t.Fatalf("Failed to read string: %s", err)
+			}
+			reply.Answer = append(reply.Answer, test.SRV(line))
+		}
+
+		f, err = os.Open("testdata/additional.txt")
+		if err != nil {
+			t.Fatalf("Failed to open additional file: %s", err)
+		}
+		defer f.Close()
+		r = bufio.NewReader(f)
+		for {
+			line, err := r.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				t.Fatalf("Failed to read string: %s", err)
+			}
+			reply.Extra = append(reply.Extra, test.A(line))
+		}
+
+		f, err = os.Open("testdata/authority.txt")
+		if err != nil {
+			t.Fatalf("Failed to open additional file: %s", err)
+		}
+		defer f.Close()
+		r = bufio.NewReader(f)
+		for {
+			line, err := r.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				t.Fatalf("Failed to read string: %s", err)
+			}
+			reply.Ns = append(reply.Ns, test.NS(line))
+		}
+
+		req.Scrub(reply)
+		want, got := req.Size(), reply.Len()
+		if want < got {
+			t.Fatalf("Want scrub to reduce message length below %d bytes, got %d bytes", want, got)
+		}
 	}
 }
 
