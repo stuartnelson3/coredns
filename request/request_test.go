@@ -159,7 +159,7 @@ func TestRequestScrubExtraRegression(t *testing.T) {
 	}
 }
 
-func TestSoundCloudNoTruncate(t *testing.T) {
+func TestTruncation(t *testing.T) {
 	for bufsize := 1024; bufsize <= 4096; bufsize += 12 {
 		m := new(dns.Msg)
 		m.SetQuestion("http.service.tcp.srv.k8s.example.org", dns.TypeSRV)
