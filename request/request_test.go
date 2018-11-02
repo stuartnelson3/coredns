@@ -1,10 +1,7 @@
 package request
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"os"
 	"testing"
 
 	"github.com/coredns/coredns/plugin/test"
@@ -165,62 +162,23 @@ func TestRequestScrubExtraRegression(t *testing.T) {
 func TestSoundCloudNoTruncate(t *testing.T) {
 	for bufsize := 1024; bufsize <= 4096; bufsize += 12 {
 		m := new(dns.Msg)
-		m.SetQuestion("http.web.stnn.rocket.srv.db.example.org", dns.TypeSRV)
+		m.SetQuestion("http.service.tcp.srv.k8s.example.org", dns.TypeSRV)
 		m.SetEdns0(uint16(bufsize), true)
 		req := Request{W: &test.ResponseWriter{}, Req: m}
 
 		reply := new(dns.Msg)
 		reply.SetReply(m)
 
-		f, err := os.Open("testdata/answers.txt")
-		if err != nil {
-			t.Fatalf("Failed to open answers file: %s", err)
-		}
-		defer f.Close()
-		r := bufio.NewReader(f)
-		for {
-			line, err := r.ReadString('\n')
-			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				t.Fatalf("Failed to read string: %s", err)
-			}
-			reply.Answer = append(reply.Answer, test.SRV(line))
+		for i := 0; i < 61; i++ {
+			reply.Answer = append(reply.Answer, test.SRV(fmt.Sprintf("http.service.tcp.srv.k8s.example.org. 5 IN SRV 0 0 80 10-144-230-%d.default.pod.k8s.example.org.", i)))
 		}
 
-		f, err = os.Open("testdata/additional.txt")
-		if err != nil {
-			t.Fatalf("Failed to open additional file: %s", err)
-		}
-		defer f.Close()
-		r = bufio.NewReader(f)
-		for {
-			line, err := r.ReadString('\n')
-			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				t.Fatalf("Failed to read string: %s", err)
-			}
-			reply.Extra = append(reply.Extra, test.A(line))
+		for i := 0; i < 5; i++ {
+			reply.Extra = append(reply.Extra, test.A(fmt.Sprintf("ip-10-10-52-5%d.subdomain.example.org. 5 IN A 10.10.52.5%d", i, i)))
 		}
 
-		f, err = os.Open("testdata/authority.txt")
-		if err != nil {
-			t.Fatalf("Failed to open additional file: %s", err)
-		}
-		defer f.Close()
-		r = bufio.NewReader(f)
-		for {
-			line, err := r.ReadString('\n')
-			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				t.Fatalf("Failed to read string: %s", err)
-			}
-			reply.Ns = append(reply.Ns, test.NS(line))
+		for i := 0; i < 5; i++ {
+			reply.Ns = append(reply.Ns, test.NS(fmt.Sprintf("srv.subdomain.example.org. 5 IN NS ip-10-10-33-6%d.subdomain.example.org.", i)))
 		}
 
 		req.Scrub(reply)
