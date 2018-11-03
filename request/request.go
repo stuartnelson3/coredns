@@ -250,14 +250,12 @@ func (r *Request) Scrub(reply *dns.Msg) *dns.Msg {
 	}
 
 	// Account for the OPT record that gets added in SizeAndDo(), subtract that length.
-	sub := 0
+	re := len(reply.Extra)
 	if r.Req.IsEdns0() != nil {
 		size -= optLen
-		sub = 1
+		// re can never be 0 because we have an OPT RR.
+		re--
 	}
-
-	// subtract to make spaces for re-added EDNS0 OPT RR.
-	re := len(reply.Extra) - sub
 
 	l, m := 0, 0
 	origExtra := reply.Extra
