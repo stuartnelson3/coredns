@@ -15,7 +15,7 @@ type Writer struct {
 func New(w dns.ResponseWriter) *Writer { return &Writer{ResponseWriter: w} }
 
 // WriteMsg records the message, but doesn't write it itself.
-func (w *Writer) WriteMsg(res *dns.Msg) error {
+func (w *Writer) WriteMsg(res *dns.Msg) (int, error) {
 	w.Msg = res
-	return nil
+	return 0, nil
 }

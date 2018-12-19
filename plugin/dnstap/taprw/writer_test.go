@@ -34,7 +34,7 @@ func TestClientQueryResponse(t *testing.T) {
 	}
 	d.Packed = bin
 
-	if err := rw.WriteMsg(m); err != nil {
+	if _, err := rw.WriteMsg(m); err != nil {
 		t.Fatal(err)
 		return
 	}
@@ -80,7 +80,7 @@ func TestClientQueryResponseWithSendOption(t *testing.T) {
 	o := SendOption{Cq: false, Cr: false}
 	rw.Send = &o
 
-	if err := rw.WriteMsg(m); err != nil {
+	if _, err := rw.WriteMsg(m); err != nil {
 		t.Fatal(err)
 		return
 	}
@@ -91,7 +91,7 @@ func TestClientQueryResponseWithSendOption(t *testing.T) {
 
 	//Send CQ
 	o.Cq = true
-	if err := rw.WriteMsg(m); err != nil {
+	if _, err := rw.WriteMsg(m); err != nil {
 		t.Fatal(err)
 		return
 	}
@@ -104,7 +104,7 @@ func TestClientQueryResponseWithSendOption(t *testing.T) {
 	trapper.Trap = trapper.Trap[:0]
 	o.Cq = false
 	o.Cr = true
-	if err := rw.WriteMsg(m); err != nil {
+	if _, err := rw.WriteMsg(m); err != nil {
 		t.Fatal(err)
 		return
 	}

@@ -36,7 +36,7 @@ func (n Nsid) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (i
 }
 
 // WriteMsg implements the dns.ResponseWriter interface.
-func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
+func (w *ResponseWriter) WriteMsg(res *dns.Msg) (int, error) {
 	if option := res.IsEdns0(); option != nil {
 		for _, o := range option.Option {
 			if e, ok := o.(*dns.EDNS0_NSID); ok {
@@ -45,8 +45,7 @@ func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
 			}
 		}
 	}
-	returned := w.ResponseWriter.WriteMsg(res)
-	return returned
+	return w.ResponseWriter.WriteMsg(res)
 }
 
 // Name implements the Handler interface.

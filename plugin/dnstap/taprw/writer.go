@@ -45,8 +45,8 @@ func (w *ResponseWriter) DnstapError() error {
 
 // WriteMsg writes back the response to the client and THEN works on logging the request
 // and response to dnstap.
-func (w *ResponseWriter) WriteMsg(resp *dns.Msg) (writeErr error) {
-	writeErr = w.ResponseWriter.WriteMsg(resp)
+func (w *ResponseWriter) WriteMsg(resp *dns.Msg) (int, error) {
+	n, writeErr := w.ResponseWriter.WriteMsg(resp)
 	writeEpoch := time.Now()
 
 	b := msg.New().Time(w.QueryEpoch).Addr(w.RemoteAddr())
@@ -75,5 +75,5 @@ func (w *ResponseWriter) WriteMsg(resp *dns.Msg) (writeErr error) {
 		}
 	}
 
-	return writeErr
+	return n, writeErr
 }

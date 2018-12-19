@@ -9,7 +9,7 @@ import (
 type RoundRobinResponseWriter struct{ dns.ResponseWriter }
 
 // WriteMsg implements the dns.ResponseWriter interface.
-func (r *RoundRobinResponseWriter) WriteMsg(res *dns.Msg) error {
+func (r *RoundRobinResponseWriter) WriteMsg(res *dns.Msg) (int, error) {
 	if res.Rcode != dns.RcodeSuccess {
 		return r.ResponseWriter.WriteMsg(res)
 	}

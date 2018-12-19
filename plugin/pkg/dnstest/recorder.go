@@ -35,13 +35,14 @@ func NewRecorder(w dns.ResponseWriter) *Recorder {
 
 // WriteMsg records the status code and calls the
 // underlying ResponseWriter's WriteMsg method.
-func (r *Recorder) WriteMsg(res *dns.Msg) error {
+func (r *Recorder) WriteMsg(res *dns.Msg) (int, error) {
 	r.Rcode = res.Rcode
 	// We may get called multiple times (axfr for instance).
 	// Save the last message, but add the sizes.
-	r.Len += res.Len()
 	r.Msg = res
-	return r.ResponseWriter.WriteMsg(res)
+	n, err := r.ResponseWriter.WriteMsg(res)
+	r.Len += n
+	return n, err
 }
 
 // Write is a wrapper that records the length of the message that gets written.

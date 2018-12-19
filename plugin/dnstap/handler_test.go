@@ -21,7 +21,7 @@ func testCase(t *testing.T, tapq, tapr *tap.Message, q, r *dns.Msg) {
 		Next: mwtest.HandlerFunc(func(_ context.Context,
 			w dns.ResponseWriter, _ *dns.Msg) (int, error) {
 
-			return 0, w.WriteMsg(r)
+			return w.WriteMsg(r)
 		}),
 		IO:             &w,
 		JoinRawMessage: false,

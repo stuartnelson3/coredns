@@ -173,10 +173,10 @@ func (r *gRPCresponse) Write(b []byte) (int, error) {
 }
 
 // These methods implement the dns.ResponseWriter interface from Go DNS.
-func (r *gRPCresponse) Close() error              { return nil }
-func (r *gRPCresponse) TsigStatus() error         { return nil }
-func (r *gRPCresponse) TsigTimersOnly(b bool)     { return }
-func (r *gRPCresponse) Hijack()                   { return }
-func (r *gRPCresponse) LocalAddr() net.Addr       { return r.localAddr }
-func (r *gRPCresponse) RemoteAddr() net.Addr      { return r.remoteAddr }
-func (r *gRPCresponse) WriteMsg(m *dns.Msg) error { r.Msg = m; return nil }
+func (r *gRPCresponse) Close() error                     { return nil }
+func (r *gRPCresponse) TsigStatus() error                { return nil }
+func (r *gRPCresponse) TsigTimersOnly(b bool)            { return }
+func (r *gRPCresponse) Hijack()                          { return }
+func (r *gRPCresponse) LocalAddr() net.Addr              { return r.localAddr }
+func (r *gRPCresponse) RemoteAddr() net.Addr             { return r.remoteAddr }
+func (r *gRPCresponse) WriteMsg(m *dns.Msg) (int, error) { r.Msg = m; return 0, nil }

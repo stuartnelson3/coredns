@@ -13,7 +13,7 @@ func NewScrubWriter(req *dns.Msg, w dns.ResponseWriter) *ScrubWriter { return &S
 
 // WriteMsg overrides the default implementation of the underlaying dns.ResponseWriter and calls
 // scrub on the message m and will then write it to the client.
-func (s *ScrubWriter) WriteMsg(m *dns.Msg) error {
+func (s *ScrubWriter) WriteMsg(m *dns.Msg) (int, error) {
 	state := Request{Req: s.req, W: s.ResponseWriter}
 
 	n := state.Scrub(m)

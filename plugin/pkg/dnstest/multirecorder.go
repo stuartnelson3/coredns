@@ -25,10 +25,11 @@ func NewMultiRecorder(w dns.ResponseWriter) *MultiRecorder {
 
 // WriteMsg records the message and its length written to it and call the
 // underlying ResponseWriter's WriteMsg method.
-func (r *MultiRecorder) WriteMsg(res *dns.Msg) error {
-	r.Len += res.Len()
+func (r *MultiRecorder) WriteMsg(res *dns.Msg) (int, error) {
 	r.Msgs = append(r.Msgs, res)
-	return r.ResponseWriter.WriteMsg(res)
+	n, err := r.ResponseWriter.WriteMsg(res)
+	r.Len += n
+	return n, err
 }
 
 // Write is a wrapper that records the length of the messages that get written to it.

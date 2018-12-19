@@ -149,7 +149,7 @@ func (w *ResponseWriter) RemoteAddr() net.Addr {
 }
 
 // WriteMsg implements the dns.ResponseWriter interface.
-func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
+func (w *ResponseWriter) WriteMsg(res *dns.Msg) (int, error) {
 	do := false
 	mt, opt := response.Typify(res, w.now().UTC())
 	if opt != nil {
@@ -179,7 +179,7 @@ func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
 	}
 
 	if w.prefetch {
-		return nil
+		return 0, nil
 	}
 
 	// Apply capped TTL to this reply to avoid jarring TTL experience 1799 -> 8 (e.g.)

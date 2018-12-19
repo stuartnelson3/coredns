@@ -1,10 +1,11 @@
 package rewrite
 
 import (
-	"github.com/miekg/dns"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/miekg/dns"
 )
 
 // ResponseRule contains a rule to rewrite a response with.
@@ -35,7 +36,7 @@ func NewResponseReverter(w dns.ResponseWriter, r *dns.Msg) *ResponseReverter {
 }
 
 // WriteMsg records the status code and calls the underlying ResponseWriter's WriteMsg method.
-func (r *ResponseReverter) WriteMsg(res *dns.Msg) error {
+func (r *ResponseReverter) WriteMsg(res *dns.Msg) (int, error) {
 	res.Question[0] = r.originalQuestion
 	if r.ResponseRewrite {
 		for _, rr := range res.Answer {
@@ -80,6 +81,5 @@ func (r *ResponseReverter) WriteMsg(res *dns.Msg) error {
 
 // Write is a wrapper that records the size of the message that gets written.
 func (r *ResponseReverter) Write(buf []byte) (int, error) {
-	n, err := r.ResponseWriter.Write(buf)
-	return n, err
+	return r.ResponseWriter.Write(buf)
 }
